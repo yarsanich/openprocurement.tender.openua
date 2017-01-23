@@ -910,7 +910,7 @@ class BaseTenderUAProcessTest(object):
         response = self.app.get('/tenders/{}'.format(tender_id))
         self.assertEqual(response.json['data']['status'], 'complete')
 
-class TenderUAProcessTest(BaseTenderUAProcessTest,BaseTenderUAWebTest):
+class TenderUAProcessTest(BaseTenderUAProcessTest, BaseTenderUAWebTest):
     pass
 
 def suite():
