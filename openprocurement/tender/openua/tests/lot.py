@@ -11,6 +11,8 @@ from openprocurement.api.tests.base import (test_lots,
                                             test_bids,
                                             test_organization,
                                             create_classmethod)
+from openprocurement.tender.openua.tests.lot_test_utils import (get_tender_lot,
+                                                                get_tender_lots)
 from openprocurement.api.tests.lot import BaseTenderLotFeatureResourceTest
 from openprocurement.tender.openua.tests.base import (BaseTenderUAContentWebTest,
                                                       test_tender_data)
@@ -20,6 +22,8 @@ class BaseTenderLotResourceTest(object):
     test_create_tender_lot_invalid = create_classmethod(create_tender_lot_invalid)
     test_delete_tender_lot = create_classmethod(delete_tender_lot)
     test_tender_lot_guarantee = create_classmethod(tender_lot_guarantee)
+    test_get_tender_lot = create_classmethod(get_tender_lot)
+    test_get_tender_lots = create_classmethod(get_tender_lots)
 
     def test_create_tender_lot(self):
         response = self.app.post_json('/tenders/{}/lots?acc_token={}'.format(
@@ -308,72 +312,6 @@ class BaseTenderLotResourceTest(object):
         self.assertEqual(response.status, '403 Forbidden')
         self.assertEqual(response.content_type, 'application/json')
 
-    def test_get_tender_lot(self):
-        response = self.app.post_json('/tenders/{}/lots?acc_token={}'.format(
-            self.tender_id, self.tender_token), {'data': test_lots[0]})
-        self.assertEqual(response.status, '201 Created')
-        self.assertEqual(response.content_type, 'application/json')
-        lot = response.json['data']
-
-        response = self.app.get('/tenders/{}/lots/{}'.format(self.tender_id, lot['id']))
-        self.assertEqual(response.status, '200 OK')
-        self.assertEqual(response.content_type, 'application/json')
-        self.assertEqual(set(response.json['data']), set([u'status', u'date', u'description', u'title', u'minimalStep', u'auctionPeriod', u'value', u'id']))
-
-        self.set_status('active.qualification')
-
-        response = self.app.get('/tenders/{}/lots/{}'.format(self.tender_id, lot['id']))
-        self.assertEqual(response.status, '200 OK')
-        self.assertEqual(response.content_type, 'application/json')
-        lot.pop('auctionPeriod')
-        self.assertEqual(response.json['data'], lot)
-
-        response = self.app.get('/tenders/{}/lots/some_id'.format(self.tender_id), status=404)
-        self.assertEqual(response.status, '404 Not Found')
-        self.assertEqual(response.content_type, 'application/json')
-        self.assertEqual(response.json['status'], 'error')
-        self.assertEqual(response.json['errors'], [
-            {u'description': u'Not Found', u'location':
-                u'url', u'name': u'lot_id'}
-        ])
-
-        response = self.app.get('/tenders/some_id/lots/some_id', status=404)
-        self.assertEqual(response.status, '404 Not Found')
-        self.assertEqual(response.content_type, 'application/json')
-        self.assertEqual(response.json['status'], 'error')
-        self.assertEqual(response.json['errors'], [
-            {u'description': u'Not Found', u'location':
-                u'url', u'name': u'tender_id'}
-        ])
-
-    def test_get_tender_lots(self):
-        response = self.app.post_json('/tenders/{}/lots?acc_token={}'.format(
-            self.tender_id, self.tender_token), {'data': test_lots[0]})
-        self.assertEqual(response.status, '201 Created')
-        self.assertEqual(response.content_type, 'application/json')
-        lot = response.json['data']
-
-        response = self.app.get('/tenders/{}/lots'.format(self.tender_id))
-        self.assertEqual(response.status, '200 OK')
-        self.assertEqual(response.content_type, 'application/json')
-        self.assertEqual(set(response.json['data'][0]), set([u'status', u'description', u'date', u'title', u'minimalStep', u'auctionPeriod', u'value', u'id']))
-
-        self.set_status('active.qualification')
-
-        response = self.app.get('/tenders/{}/lots'.format(self.tender_id))
-        self.assertEqual(response.status, '200 OK')
-        self.assertEqual(response.content_type, 'application/json')
-        lot.pop('auctionPeriod')
-        self.assertEqual(response.json['data'][0], lot)
-
-        response = self.app.get('/tenders/some_id/lots', status=404)
-        self.assertEqual(response.status, '404 Not Found')
-        self.assertEqual(response.content_type, 'application/json')
-        self.assertEqual(response.json['status'], 'error')
-        self.assertEqual(response.json['errors'], [
-            {u'description': u'Not Found', u'location':
-                u'url', u'name': u'tender_id'}
-        ])
 
 class TenderLotResourceTest(BaseTenderUAContentWebTest,
                             BaseTenderLotResourceTest):
@@ -915,7 +853,6 @@ class TenderLotProcessTest(BaseTenderUAContentWebTest):
         response = self.app.patch_json('/tenders/{}'.format(tender_id), {"data": {"id": tender_id}})
         self.assertEqual(response.json['data']["lots"][0]['status'], 'unsuccessful')
         self.assertEqual(response.json['data']['status'], 'unsuccessful')
-
 
     def test_1lot_1bid_patch(self):
         # create tender
