@@ -8,14 +8,14 @@ from openprocurement.api.tests.lot_test_utils import (create_tender_lot_invalid,
                                                       delete_tender_lot,
                                                       tender_lot_guarantee)
 from openprocurement.api.tests.base import (test_lots,
-                                            test_bids,
                                             test_organization,
                                             create_classmethod)
 from openprocurement.tender.openua.tests.lot_test_utils import (get_tender_lot,
                                                                 get_tender_lots)
 from openprocurement.api.tests.lot import BaseTenderLotFeatureResourceTest
 from openprocurement.tender.openua.tests.base import (BaseTenderUAContentWebTest,
-                                                      test_tender_data)
+                                                      test_tender_data,
+                                                      test_bids,)
 
 
 class BaseTenderLotResourceTest(object):
