@@ -3,6 +3,7 @@ import os
 import webtest
 from datetime import datetime, timedelta
 from openprocurement.api.models import get_now, SANDBOX_MODE
+from copy import deepcopy
 from openprocurement.api.tests.base import (test_tender_data as test_tender_data_api,
                                             now,
                                             test_features_tender_data,
@@ -53,7 +54,7 @@ if SANDBOX_MODE:
     test_tender_data['procurementMethodDetails'] = 'quick, accelerator=1440'
 
 test_bids = []
-for i in base_test_bids:
+for i in deepcopy(base_test_bids):
     i.update({'selfEligible': True, 'selfQualified': True})
     test_bids.append(i)
 
