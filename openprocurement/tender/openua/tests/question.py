@@ -39,8 +39,6 @@ class TenderUAQuestionResourceTest(BaseTenderUAContentWebTest, BaseTenderQuestio
 class TenderUALotQuestionResourceTest(BaseTenderUAContentWebTest, BaseTenderLotQuestionResourceTest):
     initial_lots = 2 * test_lots
 
-<<<<<<< HEAD
-=======
     def test_create_tender_question(self):
         response = self.app.post_json('/tenders/{}/cancellations?acc_token={}'.format(self.tender_id, self.tender_token), {'data': {
             'reason': 'cancellation reason',
@@ -198,7 +196,6 @@ class TenderUALotQuestionResourceTest(BaseTenderUAContentWebTest, BaseTenderLotQ
         self.assertEqual(response.json['data']['status'], 'unsuccessful')
 
 
->>>>>>> ea2a38af45478542d732d47a29e6adf2d13aafb7
 def suite():
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(TenderUAQuestionResourceTest))
