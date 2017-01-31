@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
 import unittest
 
-from datetime import datetime, timedelta
-from openprocurement.api.models import get_now
 from openprocurement.api.tests.base import test_lots, test_organization
 from openprocurement.tender.openua.tests.base import BaseTenderUAContentWebTest, test_tender_data
 from openprocurement.api.tests.question import BaseTenderQuestionResourceTest, BaseTenderLotQuestionResourceTest
 
-class BaseTenderUAQuestionResourceTest(object):
+
+class BaseTenderUAQuestionResourceTest(BaseTenderQuestionResourceTest):
     def test_create_tender_question(self):
         response = self.app.post_json('/tenders/{}/questions'.format(
-            self.tender_id), {'data': {'title': 'question title', 'description': 'question description', 'author': test_organization}})
+            self.tender_id),
+            {'data': {'title': 'question title', 'description': 'question description', 'author': test_organization}})
         self.assertEqual(response.status, '201 Created')
         self.assertEqual(response.content_type, 'application/json')
         question = response.json['data']
@@ -20,32 +20,37 @@ class BaseTenderUAQuestionResourceTest(object):
 
         self.go_to_enquiryPeriod_end()
         response = self.app.post_json('/tenders/{}/questions'.format(
-            self.tender_id), {'data': {'title': 'question title', 'description': 'question description', 'author': test_organization}}, status=403)
+            self.tender_id),
+            {'data': {'title': 'question title', 'description': 'question description', 'author': test_organization}},
+            status=403)
         self.assertEqual(response.status, '403 Forbidden')
         self.assertEqual(response.content_type, 'application/json')
         self.assertEqual(response.json['errors'][0]["description"], "Can add question only in enquiryPeriod")
 
         self.set_status('active.auction')
         response = self.app.post_json('/tenders/{}/questions'.format(
-            self.tender_id), {'data': {'title': 'question title', 'description': 'question description', 'author': test_organization}}, status=403)
+            self.tender_id),
+            {'data': {'title': 'question title', 'description': 'question description', 'author': test_organization}},
+            status=403)
         self.assertEqual(response.status, '403 Forbidden')
         self.assertEqual(response.content_type, 'application/json')
         self.assertEqual(response.json['errors'][0]["description"], "Can add question only in enquiryPeriod")
 
-class TenderUAQuestionResourceTest(BaseTenderUAContentWebTest, BaseTenderQuestionResourceTest, BaseTenderUAQuestionResourceTest):
+
+class TenderUAQuestionResourceTest(BaseTenderUAContentWebTest, BaseTenderUAQuestionResourceTest):
     status = "active.auction"
     test_tender_data = test_tender_data
 
-class TenderUALotQuestionResourceTest(BaseTenderUAContentWebTest, BaseTenderLotQuestionResourceTest):
-    initial_lots = 2 * test_lots
 
+class BaseTenderUALotQuestionResourceTest(BaseTenderLotQuestionResourceTest):
     def test_create_tender_question(self):
-        response = self.app.post_json('/tenders/{}/cancellations?acc_token={}'.format(self.tender_id, self.tender_token), {'data': {
-            'reason': 'cancellation reason',
-            'status': 'active',
-            "cancellationOf": "lot",
-            "relatedLot": self.initial_lots[0]['id']
-        }})
+        response = self.app.post_json(
+            '/tenders/{}/cancellations?acc_token={}'.format(self.tender_id, self.tender_token), {'data': {
+                'reason': 'cancellation reason',
+                'status': 'active',
+                "cancellationOf": "lot",
+                "relatedLot": self.initial_lots[0]['id']
+            }})
         self.assertEqual(response.status, '201 Created')
 
         response = self.app.post_json('/tenders/{}/questions'.format(self.tender_id), {'data': {
@@ -85,12 +90,13 @@ class TenderUALotQuestionResourceTest(BaseTenderUAContentWebTest, BaseTenderLotQ
         self.assertEqual(response.content_type, 'application/json')
         question = response.json['data']
 
-        response = self.app.post_json('/tenders/{}/cancellations?acc_token={}'.format(self.tender_id, self.tender_token), {'data': {
-            'reason': 'cancellation reason',
-            'status': 'active',
-            "cancellationOf": "lot",
-            "relatedLot": self.initial_lots[0]['id']
-        }})
+        response = self.app.post_json(
+            '/tenders/{}/cancellations?acc_token={}'.format(self.tender_id, self.tender_token), {'data': {
+                'reason': 'cancellation reason',
+                'status': 'active',
+                "cancellationOf": "lot",
+                "relatedLot": self.initial_lots[0]['id']
+            }})
         self.assertEqual(response.status, '201 Created')
 
         response = self.app.patch_json('/tenders/{}/questions/{}?acc_token={}'.format(
@@ -143,10 +149,11 @@ class TenderUALotQuestionResourceTest(BaseTenderUAContentWebTest, BaseTenderLotQ
         self.assertEqual(response.json['data']['status'], 'active.tendering')
 
         self.app.authorization = ('Basic', ('broker', ''))
-        response = self.app.post_json('/tenders/{}/cancellations?acc_token={}'.format(self.tender_id, self.tender_token), {'data': {
-            'reason': 'cancellation reason',
-            'status': 'active',
-        }})
+        response = self.app.post_json(
+            '/tenders/{}/cancellations?acc_token={}'.format(self.tender_id, self.tender_token), {'data': {
+                'reason': 'cancellation reason',
+                'status': 'active',
+            }})
         self.assertEqual(response.status, '201 Created')
 
         response = self.app.get('/tenders/{}'.format(self.tender_id))
@@ -161,12 +168,13 @@ class TenderUALotQuestionResourceTest(BaseTenderUAContentWebTest, BaseTenderLotQ
         self.assertEqual(response.json['data']['status'], 'active.tendering')
 
         self.app.authorization = ('Basic', ('broker', ''))
-        response = self.app.post_json('/tenders/{}/cancellations?acc_token={}'.format(self.tender_id, self.tender_token), {'data': {
-            'reason': 'cancellation reason',
-            'status': 'active',
-            "cancellationOf": "lot",
-            "relatedLot": self.initial_lots[0]['id']
-        }})
+        response = self.app.post_json(
+            '/tenders/{}/cancellations?acc_token={}'.format(self.tender_id, self.tender_token), {'data': {
+                'reason': 'cancellation reason',
+                'status': 'active',
+                "cancellationOf": "lot",
+                "relatedLot": self.initial_lots[0]['id']
+            }})
         self.assertEqual(response.status, '201 Created')
 
         self.app.authorization = ('Basic', ('chronograph', ''))
@@ -183,17 +191,24 @@ class TenderUALotQuestionResourceTest(BaseTenderUAContentWebTest, BaseTenderLotQ
         self.assertEqual(response.json['data']['status'], 'active.tendering')
 
         self.app.authorization = ('Basic', ('broker', ''))
-        response = self.app.post_json('/tenders/{}/cancellations?acc_token={}'.format(self.tender_id, self.tender_token), {'data': {
-            'reason': 'cancellation reason',
-            'status': 'active',
-            "cancellationOf": "lot",
-            "relatedLot": self.initial_lots[0]['id']
-        }})
+        response = self.app.post_json(
+            '/tenders/{}/cancellations?acc_token={}'.format(self.tender_id, self.tender_token), {'data': {
+                'reason': 'cancellation reason',
+                'status': 'active',
+                "cancellationOf": "lot",
+                "relatedLot": self.initial_lots[0]['id']
+            }})
         self.assertEqual(response.status, '201 Created')
 
         self.app.authorization = ('Basic', ('chronograph', ''))
         response = self.app.patch_json('/tenders/{}'.format(self.tender_id), {"data": {"id": self.tender_id}})
         self.assertEqual(response.json['data']['status'], 'unsuccessful')
+
+
+class TenderUALotQuestionResourceTest(BaseTenderUAContentWebTest,
+                                      BaseTenderUALotQuestionResourceTest):
+    initial_lots = 2 * test_lots
+
 
 def suite():
     suite = unittest.TestSuite()

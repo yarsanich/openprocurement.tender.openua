@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import unittest
 from email.header import Header
-from openprocurement.api.tests.document_test_utils import (not_found,
+from openprocurement.api.tests.document_test_blanks import (not_found,
                                                            put_tender_document,
                                                            patch_tender_document,
                                                            create_tender_document,
@@ -9,27 +9,31 @@ from openprocurement.api.tests.document_test_utils import (not_found,
                                                            create_tender_document_json,
                                                            put_tender_document_json)
 from openprocurement.tender.openua.tests.base import BaseTenderUAContentWebTest
-from openprocurement.api.tests.base import create_classmethod
+from openprocurement.api.tests.base import snitch
 
 
 class BaseTenderDocumentResourceTest(object):
     docservice = False
 
-    test_not_found = create_classmethod(not_found)
-    test_put_tender_document = create_classmethod(put_tender_document)
-    test_patch_tender_document = create_classmethod(patch_tender_document)
-    test_create_tender_document = create_classmethod(create_tender_document)
+    test_not_found = snitch(not_found)
+    test_put_tender_document = snitch(put_tender_document)
+    test_patch_tender_document = snitch(patch_tender_document)
+    test_create_tender_document = snitch(create_tender_document)
 
 class TenderDocumentResourceTest(BaseTenderUAContentWebTest,
                                  BaseTenderDocumentResourceTest):
     status = 'active.auction'
 
 
-class TenderDocumentWithDSResourceTest(TenderDocumentResourceTest):
+class BaseTenderDocumentWithDSResourceTest(object):
+    test_create_tender_document_json_invalid = snitch(create_tender_document_json_invalid)
+    test_create_tender_document_json = snitch(create_tender_document_json)
+    test_put_tender_document_json = snitch(put_tender_document_json)
+
+
+class TenderDocumentWithDSResourceTest(TenderDocumentResourceTest,
+                                       BaseTenderDocumentWithDSResourceTest):
     docservice = True
-    test_create_tender_document_json_invalid = create_classmethod(create_tender_document_json_invalid)
-    test_create_tender_document_json = create_classmethod(create_tender_document_json)
-    test_put_tender_document_json = create_classmethod(put_tender_document_json)
 
 
 def suite():
