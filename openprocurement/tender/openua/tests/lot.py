@@ -10,10 +10,10 @@ from openprocurement.api.tests.lot_test_blanks import (create_tender_lot_invalid
 from openprocurement.api.tests.base import (test_lots,
                                             test_organization,
                                             snitch)
-from openprocurement.tender.openua.tests.lot_test_blanks import (get_tender_lot,
-                                                                 get_tender_lots,
-                                                                 patch_tender_currency,
-                                                                 patch_tender_vat)
+from openprocurement.tender.openua.tests.lot_tests_blanks import (get_tender_lot,
+                                                                  get_tender_lots,
+                                                                  patch_tender_currency,
+                                                                  patch_tender_vat)
 from openprocurement.api.tests.lot import BaseTenderLotFeatureResourceTest
 from openprocurement.tender.openua.tests.base import (BaseTenderUAContentWebTest,
                                                       test_tender_data,
