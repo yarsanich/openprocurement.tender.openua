@@ -1,42 +1,47 @@
 # -*- coding: utf-8 -*-
 import unittest
 
-from datetime import datetime, timedelta
-from openprocurement.api.models import get_now
-from openprocurement.api.tests.base import test_lots, test_organization
+from openprocurement.api.tests.base import test_lots, test_organization, snitch
 from openprocurement.tender.openua.tests.base import BaseTenderUAContentWebTest, test_tender_data
 from openprocurement.api.tests.question import BaseTenderQuestionResourceTest, BaseTenderLotQuestionResourceTest
+from openprocurement.tender.openua.tests.question_tests_blanks import (create_tender_question,
+                                                                       patch_tender_question,
+                                                                       tender_has_unanswered_questions,
+                                                                       lot_has_unanswered_questions,
+                                                                       item_has_unanswered_questions,
+                                                                       create_tender_question_lot)
 
-class BaseTenderUAQuestionResourceTest(object):
-    def test_create_tender_question(self):
-        response = self.app.post_json('/tenders/{}/questions'.format(
-            self.tender_id), {'data': {'title': 'question title', 'description': 'question description', 'author': test_organization}})
-        self.assertEqual(response.status, '201 Created')
-        self.assertEqual(response.content_type, 'application/json')
-        question = response.json['data']
-        self.assertEqual(question['author']['name'], test_organization['name'])
-        self.assertIn('id', question)
-        self.assertIn(question['id'], response.headers['Location'])
 
-        self.go_to_enquiryPeriod_end()
-        response = self.app.post_json('/tenders/{}/questions'.format(
-            self.tender_id), {'data': {'title': 'question title', 'description': 'question description', 'author': test_organization}}, status=403)
-        self.assertEqual(response.status, '403 Forbidden')
-        self.assertEqual(response.content_type, 'application/json')
-        self.assertEqual(response.json['errors'][0]["description"], "Can add question only in enquiryPeriod")
+class BaseTenderUAQuestionResourceTest(BaseTenderQuestionResourceTest):
+    test_create_tender_question = snitch(create_tender_question)
 
-        self.set_status('active.auction')
-        response = self.app.post_json('/tenders/{}/questions'.format(
-            self.tender_id), {'data': {'title': 'question title', 'description': 'question description', 'author': test_organization}}, status=403)
-        self.assertEqual(response.status, '403 Forbidden')
-        self.assertEqual(response.content_type, 'application/json')
-        self.assertEqual(response.json['errors'][0]["description"], "Can add question only in enquiryPeriod")
 
-class TenderUAQuestionResourceTest(BaseTenderUAContentWebTest, BaseTenderQuestionResourceTest, BaseTenderUAQuestionResourceTest):
+class TenderUAQuestionResourceTest(BaseTenderUAContentWebTest, BaseTenderUAQuestionResourceTest):
     status = "active.auction"
     test_tender_data = test_tender_data
 
-class TenderUALotQuestionResourceTest(BaseTenderUAContentWebTest, BaseTenderLotQuestionResourceTest):
+
+class BaseTenderUALotQuestionResourceTest(BaseTenderLotQuestionResourceTest):
+    def create_question_for(self, questionOf, relatedItem):
+        response = self.app.post_json('/tenders/{}/questions'.format(self.tender_id), {'data': {
+            'title': 'question title',
+            'description': 'question description',
+            "questionOf": questionOf,
+            "relatedItem": relatedItem,
+            'author': test_organization
+        }})
+        self.assertEqual(response.status, '201 Created')
+        return response.json['data']['id']
+
+    test_create_tender_question_lot = snitch(create_tender_question_lot)
+    test_patch_tender_question = snitch(patch_tender_question)
+    test_tender_has_unanswered_questions = snitch(tender_has_unanswered_questions)
+    test_lot_has_unanswered_questions = snitch(lot_has_unanswered_questions)
+    test_item_has_unanswered_questions = snitch(item_has_unanswered_questions)
+
+
+class TenderUALotQuestionResourceTest(BaseTenderUAContentWebTest,
+                                      BaseTenderUALotQuestionResourceTest):
     initial_lots = 2 * test_lots
 
 def suite():
