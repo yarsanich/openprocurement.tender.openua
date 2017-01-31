@@ -1,16 +1,6 @@
 # -*- coding: utf-8 -*-
-import unittest
-from copy import deepcopy
-from datetime import timedelta
+from openprocurement.api.tests.base import test_lots
 
-from openprocurement.api.models import get_now
-from openprocurement.api.tests.base import (test_lots,
-                                            test_bids,
-                                            test_organization,
-                                            create_classmethod)
-from openprocurement.api.tests.lot import BaseTenderLotFeatureResourceTest
-from openprocurement.tender.openua.tests.base import (BaseTenderUAContentWebTest,
-                                                      test_tender_data)
 
 def get_tender_lot(self):
     response = self.app.post_json('/tenders/{}/lots?acc_token={}'.format(
