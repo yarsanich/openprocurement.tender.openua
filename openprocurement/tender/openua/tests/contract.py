@@ -1,16 +1,13 @@
 # -*- coding: utf-8 -*-
 import unittest
-from datetime import timedelta
-
-from openprocurement.api.models import get_now
 from openprocurement.api.tests.base import (test_organization,
-                                            create_classmethod)
-from openprocurement.tender.openua.tests.contract_test_utils import (
+                                            snitch)
+from openprocurement.tender.openua.tests.contract_tests_utils import (
     create_tender_contract,
     patch_tender_contract,
     patch_tender_contract_datesigned
 )
-from openprocurement.api.tests.contract_test_utils import (
+from openprocurement.api.tests.contract_tests_utils import (
     create_tender_contract_invalid,
     get_tender_contract,
     get_tender_contracts,
@@ -26,12 +23,12 @@ class TenderContractResourceTest(BaseTenderUAContentWebTest):
     #initial_data = tender_data
     initial_status = 'active.qualification'
     initial_bids = test_bids
-    test_create_tender_contract_invalid = create_classmethod(create_tender_contract_invalid)
-    test_get_tender_contract = create_classmethod(get_tender_contract)
-    test_get_tender_contracts = create_classmethod(get_tender_contracts)
-    test_create_tender_contract = create_classmethod(create_tender_contract)
-    test_patch_tender_contract = create_classmethod(patch_tender_contract)
-    test_patch_tender_contract_datesigned = create_classmethod(patch_tender_contract_datesigned)
+    test_create_tender_contract_invalid = snitch(create_tender_contract_invalid)
+    test_get_tender_contract = snitch(get_tender_contract)
+    test_get_tender_contracts = snitch(get_tender_contracts)
+    test_create_tender_contract = snitch(create_tender_contract)
+    test_patch_tender_contract = snitch(patch_tender_contract)
+    test_patch_tender_contract_datesigned = snitch(patch_tender_contract_datesigned)
     def setUp(self):
         super(TenderContractResourceTest, self).setUp()
         # Create award
@@ -51,10 +48,10 @@ class TenderContractDocumentResourceTest(BaseTenderUAContentWebTest):
     initial_status = 'active.qualification'
     status = "unsuccessful"
     initial_bids = test_bids
-    test_not_found = create_classmethod(not_found)
-    test_create_tender_contract_document = create_classmethod(create_tender_contract_document)
-    test_put_tender_contract_document = create_classmethod(put_tender_contract_document)
-    test_patch_tender_contract_document = create_classmethod(patch_tender_contract_document)
+    test_not_found = snitch(not_found)
+    test_create_tender_contract_document = snitch(create_tender_contract_document)
+    test_put_tender_contract_document = snitch(put_tender_contract_document)
+    test_patch_tender_contract_document = snitch(patch_tender_contract_document)
 
     def setUp(self):
         super(TenderContractDocumentResourceTest, self).setUp()
