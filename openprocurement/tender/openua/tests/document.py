@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import unittest
-from email.header import Header
 from openprocurement.api.tests.document_test_blanks import (not_found,
                                                            put_tender_document,
                                                            patch_tender_document,
